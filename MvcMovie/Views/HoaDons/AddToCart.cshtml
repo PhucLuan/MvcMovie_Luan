@@ -1,0 +1,54 @@
+﻿@model MvcMovie.Models.HoaDon
+@{
+    ViewBag.Title = "Giỏ hàng";
+}
+<h2>Your cart</h2>
+<table id="cartTable" class="table">
+    <thead>
+        <tr>
+            <th>Số lượng</th>
+            <th>Sản phẩm</th>
+            <th class="text-right">Giá</th>
+            <th class="text-right">Thành Tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var hoaDonChiTiet in Model.ChiTietHoaDons)
+        {
+            <tr>
+                <td class="text-center">@hoaDonChiTiet.SoLuong</td>
+                <td class="text-left">@hoaDonChiTiet.MovieObj.Title</td>
+                <td class="textright">@hoaDonChiTiet.MovieObj.Price.ToString("c")</td>
+                <td class="text-right">
+                    @((hoaDonChiTiet.SoLuong * hoaDonChiTiet.MovieObj.Price).ToString("c"))
+                </td>
+                <td>
+                    @Html.ActionLink("Remove", "RemoveFromCart",
+                    new { maMovies = hoaDonChiTiet.MaMovie }, new
+                    {
+                    @class = "btn btn-sm btn-warning"
+                    })
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="text-right">Total:</td>
+            <td class="text-right">
+                @Model.TongTien.ToString("c")
+            </td>
+        </tr>
+    </tfoot>
+</table>
+<div class="text-center">
+    @Html.ActionLink("Continue shopping", "Index", null, new
+    {
+    @class = "btn btn-primary"
+    })
+    @Html.ActionLink("Checkout now", "Checkout", null, new
+    {
+    @class = "btn btn-primary"
+    })
+</div>
+
