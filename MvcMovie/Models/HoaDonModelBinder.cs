@@ -10,8 +10,7 @@ namespace MvcMovie.Models
     public class HoaDonModelBinder : IModelBinder
     {
         private const string sessionKey ="HoaDon";
-        public object
-        BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         {
             // get the Cart from the session
             HoaDon cart = null;
