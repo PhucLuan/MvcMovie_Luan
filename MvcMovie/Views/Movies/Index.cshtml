@@ -67,6 +67,8 @@
             <p>
                 @Html.DisplayNameFor(model => model.Genre): @Html.DisplayFor(modelItem => item.GenreObj.Name)
             </p>
+            <a asp-action="AddToCart" asp-route-id="@item.Id">Add to Cart</a>
+
             <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
             <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
             <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>

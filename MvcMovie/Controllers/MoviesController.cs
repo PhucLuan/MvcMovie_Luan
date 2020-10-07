@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Data;
 using MvcMovie.Models;
+using MvcMovie.Utils;
 
 namespace MvcMovie.Controllers
 {
@@ -206,6 +209,108 @@ namespace MvcMovie.Controllers
             _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult AddToCart(int id, HoaDon hoaDon)
+        {
+            //Kiem tra Id movie ton tai hay khong
+            var movie = _context.Movies.Where(x => x.Id
+            == id).FirstOrDefault();
+            if (movie == null)
+            {
+                return RedirectToAction("Index");
+            }
+            //var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
+            if (hoaDon == null)
+            {
+                hoaDon = new HoaDon();
+                hoaDon.NgayLap = DateTime.Now;
+                hoaDon.ChiTietHoaDons = new
+                List<ChiTietHoaDon>();
+                _context.HoaDons.Add(hoaDon);
+            }
+            //Kiem tra don hang da co truoc do
+            var chiTietHoaDon = hoaDon.ChiTietHoaDons.Where(x => x.MovieObj.Id == id).FirstOrDefault();
+            if (chiTietHoaDon == null)
+            {
+                chiTietHoaDon = new ChiTietHoaDon();
+                chiTietHoaDon.MaMovie = id;
+                chiTietHoaDon.MovieObj = movie;
+                chiTietHoaDon.HoaDonObj = hoaDon;
+                chiTietHoaDon.SoLuong = 1;
+                hoaDon.ChiTietHoaDons.Add(chiTietHoaDon);
+            }
+            else
+            {
+                chiTietHoaDon.SoLuong++;
+            }
+            HttpContext.Session.Set<HoaDon>("HoaDon", hoaDon);
+            _context.SaveChanges();
+            return View(hoaDon);
+        }
+
+        public ActionResult RemoveFromCart(int maMovies, HoaDon hoaDon)
+        {
+            //var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
+            var chiTietHoaDon = hoaDon.ChiTietHoaDons.Where(x =>
+            x.MovieObj.Id == maMovies).FirstOrDefault();
+            hoaDon.ChiTietHoaDons.Remove(chiTietHoaDon);
+            return View("AddToCart", hoaDon);
+        }
+
+        public PartialViewResult Summary()
+        {
+            //var hoaDon = this.Session["HoaDon"] as HoaDon;
+            //if (hoaDon == null)
+            //{
+            //    return null;
+            //}
+            //return PartialView(hoaDon);
+            return PartialView();
+        }
+
+        [HttpPost]
+        public ActionResult Checkout(ShippingDetail detail, HoaDon hoaDon)
+        {
+            //var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
+            if (hoaDon.ChiTietHoaDons.Count() == 0)
+            {
+                ModelState.AddModelError("", "Sorry, your cart is empty!");
+            }
+            if (ModelState.IsValid)
+            {
+                StringBuilder body = new StringBuilder()
+                .AppendLine("A new order has been submitted")
+                .AppendLine("---")
+                .AppendLine("Items:");
+                foreach (var hoaDonChiTiet in hoaDon.ChiTietHoaDons)
+                {
+                    var subtotal = hoaDonChiTiet.MovieObj.Price * hoaDonChiTiet.SoLuong;
+                    body.AppendFormat("{0} x {1} (subtotal: {2:c}", hoaDonChiTiet.SoLuong,
+                    hoaDonChiTiet.MovieObj.Title,
+                    subtotal);
+                }
+                body.AppendFormat("Total order value: {0:c}", hoaDon.TongTien)
+                .AppendLine("---")
+                .AppendLine("Ship to:")
+                .AppendLine(detail.Name)
+                .AppendLine(detail.Address)
+                .AppendLine(detail.Mobile.ToString());
+                MailUtils.SendMailGoogleSmtp("BIS@ueh.edu.vn", detail.Email, "New order submitted!",
+                body.ToString(),
+                "your@gmail", "your gmail Pass");
+                HttpContext.Session.Set<HoaDon>("HoaDon", null);
+                return View("CheckoutCompleted");
+            }
+            else
+            {
+                return View(new ShippingDetail());
+            }
+        }
+
+        public IActionResult CheckoutCompleted()
+        {
+            return View();
         }
 
         private bool MovieExists(int id)

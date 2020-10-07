@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Session;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MvcMovie
 {
@@ -39,11 +40,12 @@ namespace MvcMovie
 
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.IdleTimeout = TimeSpan.FromMinutes(100);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-
+            services.AddMvc()
+            .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
