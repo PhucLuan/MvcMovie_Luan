@@ -32,8 +32,18 @@ namespace MvcMovie
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //Use session
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddControllersWithViews();
-            //services.AddSession();
             services.AddRazorPages();
         }
 
@@ -58,6 +68,9 @@ namespace MvcMovie
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            //Use session
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

@@ -13,8 +13,7 @@ namespace MvcMovie.Models
 {
     public class EmailServiceNew : IIdentityMessageService
     {
-        public static async Task
-        SendEmail(IdentityMessage message, string attachedFile = null)
+        public static async Task SendEmail(IdentityMessage message, string attachedFile = null)
         {
             // Plug in your email service here to send an email.
             await configSendGridasync(message, attachedFile);
