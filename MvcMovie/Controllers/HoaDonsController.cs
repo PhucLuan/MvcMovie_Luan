@@ -21,45 +21,49 @@ namespace MvcMovie.Controllers
         }
         public IActionResult AddToCart(int id)
         {
-            ////Kiem tra Id movie ton tai hay khong
-            //var movie = _context.Movies.Where(x => x.Id == id).FirstOrDefault();
-            //if (movie == null)
-            //{
-            //    return RedirectToAction("Index");
-            //}
-            //var hoaDon = this.Session["HoaDon"] as HoaDon;
-            //if (hoaDon == null)
-            //{
-            //    hoaDon = new HoaDon();
-            //    hoaDon.NgayLap =
-            //    DateTime.Now;
-            //    hoaDon.ChiTietHoaDons = new
-            //    List<ChiTietHoaDon>();
-            //    this.Session["HoaDon"] = hoaDon;
-            //    _context.HoaDons.Add(hoaDon);
-            //}
-            ////Kiem tra don hang da co truoc do
-            //var chiTietHoaDon =
-            //hoaDon.ChiTietHoaDons.Where(x =>
-            //x.MovieObj.Id == id).FirstOrDefault();
-            //if (chiTietHoaDon == null)
-            //{
-            //    chiTietHoaDon = new
-            //    ChiTietHoaDon();
-            //    chiTietHoaDon.MaMovie = id;
-            //    chiTietHoaDon.MovieObj = movie;
-            //    chiTietHoaDon.HoaDonObj =
-            //    hoaDon;
-            //    chiTietHoaDon.SoLuong = 1;
-            //    hoaDon.ChiTietHoaDons.Add(chiTietHoaDon);
-            //}
-            //else
-            //{
-            //    chiTietHoaDon.SoLuong++;
-            //}
-            //_context.SaveChanges();
-            //return View(hoaDon);
-            return View();
+            //Kiem tra Id movie ton tai hay khong
+            var movie = _context.Movies.Where(x => x.Id == id).FirstOrDefault();
+            if (movie == null)
+            {
+                return RedirectToAction("Index");
+            }
+            HttpContext.Session.SetString("Test", "TestValue");
+
+            HoaDon hoaDon; 
+            //hoaDon = this.Session["HoaDon"] as HoaDon;
+
+            hoaDon = JsonConvert.DeserializeObject<HoaDon>(HttpContext.Session.GetString("SessionHoaDon"));
+            if (hoaDon == null)
+            {
+                hoaDon = new HoaDon();
+                hoaDon.NgayLap = DateTime.Now;
+                hoaDon.ChiTietHoaDons = new List<ChiTietHoaDon>();
+                hoaDon = JsonConvert.DeserializeObject<HoaDon>(HttpContext.Session.GetString("SessionHoaDon"));
+                //this.Session["HoaDon"] = hoaDon;
+                _context.HoaDons.Add(hoaDon);
+            }
+            //Kiem tra don hang da co truoc do
+            var chiTietHoaDon =
+            hoaDon.ChiTietHoaDons.Where(x =>
+            x.MovieObj.Id == id).FirstOrDefault();
+            if (chiTietHoaDon == null)
+            {
+                chiTietHoaDon = new
+                ChiTietHoaDon();
+                chiTietHoaDon.MaMovie = id;
+                chiTietHoaDon.MovieObj = movie;
+                chiTietHoaDon.HoaDonObj =
+                hoaDon;
+                chiTietHoaDon.SoLuong = 1;
+                hoaDon.ChiTietHoaDons.Add(chiTietHoaDon);
+            }
+            else
+            {
+                chiTietHoaDon.SoLuong++;
+            }
+            _context.SaveChanges();
+            return View(hoaDon);
+            //return View();
         }
 
         public ActionResult RemoveFromCart(int maMovies)

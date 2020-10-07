@@ -4,8 +4,38 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<!-- Style sheet-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<link rel="stylesheet" href="main.css">
+<link rel="stylesheet" type="text/css" href="./xZoom-master/dist/xzoom.css" media="all" />
 
+<!--JS-->
+<!-- get jQuery from the google apis -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="~/bootstrap-star-rating-master/css/star-rating.css" media="all" type="text/css" />
+<link rel="stylesheet" href="./bootstrap-star-rating-master/themes/krajee-fa/theme.css" media="all" type="text/css" />
+<link rel="stylesheet" href="./bootstrap-star-rating-master/themes/krajee-svg/theme.css" media="all" type="text/css" />
+<link rel="stylesheet" href="./bootstrap-star-rating-master/themes/krajee-uni/theme.css" media="all" type="text/css" />
+
+<script src="~/bootstrap-star-rating-master/js/star-rating.js" type="text/javascript"></script>
+<script src="~/bootstrap-star-rating-master/themes/krajee-fa/theme.js" type="text/javascript"></script>
+<script src="~/bootstrap-star-rating-master/themes/krajee-svg/theme.js" type="text/javascript"></script>
+<script src="~/bootstrap-star-rating-master/themes/krajee-uni/theme.js" type="text/javascript"></script>
+
+<h1>Index</h1>
+@*@section Scripts {
+    <link href="~/bootstrap-star-rating-master/" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap-star-rating/starrating.js"></script>
+    <script>
+        $(function () {
+            // Binding the paste-able jQuery plug-in.
+            $("#Rated").rating();
+        })();
+    </script>
+    }*@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -13,32 +43,38 @@
     <div class="row grid-demo">
         @foreach (var item in Model)
         {
-            <div class="col-md-4">
-                <img src="@item.PicturePath"
-                     style="width: 200px;" />
-                <p>
-                    @Html.DisplayNameFor(model => model.Title): @Html.DisplayFor(modelItem => item.Title)
-                </p>
-                <p>
-                    @Html.DisplayNameFor(model => model.Rated): @Html.DisplayFor(modelItem => item.Rated)
-                </p>
-                <p>
-                    @Html.DisplayNameFor(model => model.Price): @Html.DisplayFor(modelItem => item.Price)
-                </p>
-                <p>
-                    @Html.DisplayNameFor(model => model.Summary): @Html.DisplayFor(modelItem => item.Summary)
-                </p>
-                <p>
-                    @Html.DisplayNameFor(model => model.ReleaseDate): @Html.DisplayFor(modelItem =>item.ReleaseDate)
-                </p>
-                <p>
-                    @Html.DisplayNameFor(model => model.Genre): @Html.DisplayFor(modelItem =>item.GenreObj.Name)
-                </p>
-            </div>
+        <div class="col-md-4">
+            <img src="@item.PicturePath"
+                 style="width: 200px;" />
+            <p>
+                @Html.DisplayNameFor(model => model.Title): @Html.DisplayFor(modelItem => item.Title)
+            </p>
+            <p>
+                @Html.DisplayNameFor(model => model.Rated): @*@Html.DisplayFor(modelItem => item.Rated)*@
+            <p>
+                <input type="text" class="rating rating-loading" value="@Html.DisplayFor(modelItem => item.Rated)" data-size="sm" title="">
+            </p>
+            </p>
+            <p>
+                @Html.DisplayNameFor(model => model.Price): @Html.DisplayFor(modelItem => item.Price)
+            </p>
+            <p>
+                @Html.DisplayNameFor(model => model.Summary): @Html.DisplayFor(modelItem => item.Summary)
+            </p>
+            <p>
+                @Html.DisplayNameFor(model => model.ReleaseDate): @Html.DisplayFor(modelItem => item.ReleaseDate)
+            </p>
+            <p>
+                @Html.DisplayNameFor(model => model.Genre): @Html.DisplayFor(modelItem => item.GenreObj.Name)
+            </p>
+            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+        </div>
         }
     </div>
 </div>
-<table class="table">
+@*<table class="table">
     <thead>
         <tr>
             <th>
@@ -69,39 +105,40 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Summary)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReleaseDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rated)
-            </td>
-            <td>
-                <img src="@item.PicturePath"
-                     style="width: 200px;" />
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GenreObj.IdGenre)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Summary)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReleaseDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Genre)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rated)
+                </td>
+                <td>
+                    <img src="@item.PicturePath"
+                         style="width: 200px;" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GenreObj.IdGenre)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
-</table>
+</table>*@
