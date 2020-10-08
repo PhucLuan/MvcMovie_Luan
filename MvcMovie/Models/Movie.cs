@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using MvcMovie.Data;
 using System;
@@ -6,6 +7,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MvcMovie.Models
@@ -50,6 +53,7 @@ namespace MvcMovie.Models
         //[GenreAttribute]
         [ForeignKey("GenreObj")]
         public int IdGenre { get; set; }
+
         public virtual Genre GenreObj { get; set; }
     }
     //Release Date: lớn hơn ngày hiện tại, hiện thị kiểu ngày tháng năm

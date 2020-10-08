@@ -12,8 +12,9 @@ using MvcMovie.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Session;
 using Microsoft.AspNetCore.Mvc;
+using MvcMovie.Models;
+using Microsoft.CodeAnalysis;
 
 namespace MvcMovie
 {
@@ -44,8 +45,8 @@ namespace MvcMovie
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            services.AddMvc()
-            .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            //.AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

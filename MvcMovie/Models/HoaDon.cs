@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MvcMovie.Models
@@ -16,6 +18,8 @@ namespace MvcMovie.Models
         }
         [Key]
         public int MaHoaDon { get; set; }
+        [JsonIgnore]
+        [IgnoreDataMember]
         public IList<ChiTietHoaDon> ChiTietHoaDons { get; set; }
         public double TongTien { get; set; }
         public DateTime NgayLap { get; set; }

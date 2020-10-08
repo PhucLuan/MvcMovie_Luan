@@ -211,7 +211,7 @@ namespace MvcMovie.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult AddToCart(int id, HoaDon hoaDon)
+        public IActionResult AddToCart(int id)
         {
             //Kiem tra Id movie ton tai hay khong
             var movie = _context.Movies.Where(x => x.Id
@@ -220,13 +220,12 @@ namespace MvcMovie.Controllers
             {
                 return RedirectToAction("Index");
             }
-            //var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
+            var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
             if (hoaDon == null)
             {
                 hoaDon = new HoaDon();
                 hoaDon.NgayLap = DateTime.Now;
-                hoaDon.ChiTietHoaDons = new
-                List<ChiTietHoaDon>();
+                hoaDon.ChiTietHoaDons = new List<ChiTietHoaDon>();
                 _context.HoaDons.Add(hoaDon);
             }
             //Kiem tra don hang da co truoc do
