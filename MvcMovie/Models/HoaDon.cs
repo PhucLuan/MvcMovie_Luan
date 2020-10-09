@@ -18,11 +18,11 @@ namespace MvcMovie.Models
         }
         [Key]
         public int MaHoaDon { get; set; }
-        [JsonIgnore]
-        [IgnoreDataMember]
+        public string MaHoaDonTam { get; set; }
         public IList<ChiTietHoaDon> ChiTietHoaDons { get; set; }
         public double TongTien { get; set; }
         public DateTime NgayLap { get; set; }
         public int? MaKhachHang { get; set; }
+        public bool DaThanhToan { get; set; }
     }
 }

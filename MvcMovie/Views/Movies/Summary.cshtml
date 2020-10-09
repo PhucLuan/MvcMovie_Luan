@@ -11,7 +11,10 @@
 </div>
 <div class="navbar-text navbar-right">
     <b>Giỏ hàng của bạn:</b>
-    @Model.ChiTietHoaDons.Sum(x => x.SoLuong) sản phẩm,
-    @Model.TongTien.ToString("c")
+    @if (Model != null)
+    {
+        @*@Model.ChiTietHoaDons.Sum(x => x.SoLuong)sản phẩm,
+        @Model.TongTien.ToString("c")*@
+   }
 </div>
 

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using MvcMovie.Data;
 using MvcMovie.Models;
 using MvcMovie.Utils;
@@ -17,6 +18,7 @@ namespace MvcMovie.Controllers
     public class MoviesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private const string CartId = "CartId";
 
         public MoviesController(ApplicationDbContext context)
         {
@@ -27,6 +29,25 @@ namespace MvcMovie.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Movies.Include(m => m.GenreObj);
+            bool isExisted = await _context.HoaDons.AnyAsync(x => x.MaHoaDonTam == Request.Cookies[CartId]);
+            if (!isExisted)
+            {
+                var cookie = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddMonths(3)
+                };
+                var cartId = Guid.NewGuid();
+                var hoaDon = new HoaDon
+                {
+                    MaHoaDonTam = cartId.ToString()
+                };
+
+                _context.HoaDons.Add(hoaDon);
+                await _context.SaveChangesAsync();
+
+                Response.Cookies.Append(CartId, cartId.ToString());
+            }
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -211,40 +232,43 @@ namespace MvcMovie.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult AddToCart(int id)
+        public async Task<IActionResult> AddToCart(int id, HoaDon hoaDon)
         {
             //Kiem tra Id movie ton tai hay khong
-            var movie = _context.Movies.Where(x => x.Id
-            == id).FirstOrDefault();
+            var movie = _context.Movies.FirstOrDefault(x => x.Id == id);
             if (movie == null)
             {
                 return RedirectToAction("Index");
             }
-            var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
-            if (hoaDon == null)
-            {
-                hoaDon = new HoaDon();
-                hoaDon.NgayLap = DateTime.Now;
-                hoaDon.ChiTietHoaDons = new List<ChiTietHoaDon>();
-                _context.HoaDons.Add(hoaDon);
-            }
+
+            string cookie = Request.Cookies[CartId];
+
+            hoaDon = await _context.HoaDons.Include(x => x.ChiTietHoaDons).ThenInclude(x => x.MovieObj).FirstOrDefaultAsync(x => x.MaHoaDonTam == cookie);
+
             //Kiem tra don hang da co truoc do
-            var chiTietHoaDon = hoaDon.ChiTietHoaDons.Where(x => x.MovieObj.Id == id).FirstOrDefault();
+            var chiTietHoaDon = hoaDon.ChiTietHoaDons.FirstOrDefault(x => x.MaMovie == id);
             if (chiTietHoaDon == null)
             {
-                chiTietHoaDon = new ChiTietHoaDon();
-                chiTietHoaDon.MaMovie = id;
-                chiTietHoaDon.MovieObj = movie;
-                chiTietHoaDon.HoaDonObj = hoaDon;
-                chiTietHoaDon.SoLuong = 1;
+                chiTietHoaDon = new ChiTietHoaDon
+                {
+                    MaMovie = id,
+                    MovieObj = movie,
+                    HoaDonObj = hoaDon,
+                    SoLuong = 1
+                };
+
                 hoaDon.ChiTietHoaDons.Add(chiTietHoaDon);
             }
             else
             {
                 chiTietHoaDon.SoLuong++;
             }
-            HttpContext.Session.Set<HoaDon>("HoaDon", hoaDon);
-            _context.SaveChanges();
+
+            hoaDon.TongTien = hoaDon.ChiTietHoaDons
+                .Select(x => x.SoLuong * (double)x.MovieObj.Price)
+                .Aggregate(0D, (cur, next) => (cur + next));
+
+            await _context.SaveChangesAsync();
             return View(hoaDon);
         }
 
