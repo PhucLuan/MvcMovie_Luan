@@ -3,7 +3,7 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-    <ul class="navbar-nav">
+    <ul class="navbar-nav navbar-right navbar-text">
         @if (SignInManager.IsSignedIn(User))
         {
             <li class="nav-item">
@@ -23,9 +23,8 @@
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
             </li>
-            @await Html.PartialAsync("/Views/Movies/Summary.cshtml",@Context.Session.Get<HoaDon>("HoaDon"))
+            <li class="nav-item" style="display:flex">
+                @await Html.PartialAsync("/Views/Movies/Summary.cshtml", @ViewBag.HoaDon as HoaDon)
+            </li>
         }
     </ul>
-@*<ul class="nav navbar-nav navbar-right">
-    @Html.ActionLink("Summary", "Movies")
-</ul>*@

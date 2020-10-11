@@ -43,104 +43,104 @@
     <div class="row grid-demo">
         @foreach (var item in Model)
         {
-        <div class="col-md-4">
-            <img src="@item.PicturePath"
-                 style="width: 200px;" />
-            <p>
-                @Html.DisplayNameFor(model => model.Title): @Html.DisplayFor(modelItem => item.Title)
-            </p>
-            <p>
-                @Html.DisplayNameFor(model => model.Rated): @*@Html.DisplayFor(modelItem => item.Rated)*@
-            <p>
-                <input type="text" class="rating rating-loading" value="@Html.DisplayFor(modelItem => item.Rated)" data-size="sm" title="">
-            </p>
-            </p>
-            <p>
-                @Html.DisplayNameFor(model => model.Price): @Html.DisplayFor(modelItem => item.Price)
-            </p>
-            <p>
-                @Html.DisplayNameFor(model => model.Summary): @Html.DisplayFor(modelItem => item.Summary)
-            </p>
-            <p>
-                @Html.DisplayNameFor(model => model.ReleaseDate): @Html.DisplayFor(modelItem => item.ReleaseDate)
-            </p>
-            <p>
-                @Html.DisplayNameFor(model => model.Genre): @Html.DisplayFor(modelItem => item.GenreObj.Name)
-            </p>
-            <a asp-action="AddToCart" asp-route-id="@item.Id">Add to Cart</a>
+            <div class="col-md-4">
+                <img src="@item.PicturePath"
+                     style="width: 200px;" />
+                <p>
+                    @Html.DisplayNameFor(model => model.Title): @Html.DisplayFor(modelItem => item.Title)
+                </p>
+                <p>
+                    @Html.DisplayNameFor(model => model.Rated): @*@Html.DisplayFor(modelItem => item.Rated)*@
+                <p>
+                    <input type="text" class="rating rating-loading" value="@Html.DisplayFor(modelItem => item.Rated)" data-size="sm" title="">
+                </p>
 
-            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-        </div>
+                <p>
+                    @Html.DisplayNameFor(model => model.Price): @Html.DisplayFor(modelItem => item.Price)
+                </p>
+                <p>
+                    @Html.DisplayNameFor(model => model.Summary): @Html.DisplayFor(modelItem => item.Summary)
+                </p>
+                <p>
+                    @Html.DisplayNameFor(model => model.ReleaseDate): @Html.DisplayFor(modelItem => item.ReleaseDate)
+                </p>
+                <p>
+                    @Html.DisplayNameFor(model => model.Genre): @Html.DisplayFor(modelItem => item.GenreObj.Name)
+                </p>
+                <a asp-action="AddToCart" asp-route-id="@item.Id">Add to Cart</a>
+
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </div>
         }
     </div>
 </div>
 @*<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Summary)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReleaseDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Genre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Rated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PicturePath)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GenreObj)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Summary)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ReleaseDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Genre)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Rated)
-                </td>
-                <td>
-                    <img src="@item.PicturePath"
-                         style="width: 200px;" />
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.GenreObj.IdGenre)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Summary)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ReleaseDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Genre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Rated)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PicturePath)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GenreObj)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>*@
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Summary)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReleaseDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Genre)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Rated)
+                    </td>
+                    <td>
+                        <img src="@item.PicturePath"
+                             style="width: 200px;" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GenreObj.IdGenre)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>*@

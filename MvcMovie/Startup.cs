@@ -81,6 +81,9 @@ namespace MvcMovie
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Movies}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Movies}/{action=Checkout}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

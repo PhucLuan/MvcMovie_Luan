@@ -1,20 +1,22 @@
-﻿
+﻿@model MvcMovie.Models.HoaDon
 @{
     ViewData["Title"] = "Summary";
 }
 
-<h1>Summary</h1>
-@model MvcMovie.Models.HoaDon
-<div class="navbar-right">
-    @Html.ActionLink("Checkout", "Checkout", "Movies",
-    new { @class = "btn btn-default navbar-btn" })
-</div>
-<div class="navbar-text navbar-right">
-    <b>Giỏ hàng của bạn:</b>
-    @if (Model != null)
-    {
-        @*@Model.ChiTietHoaDons.Sum(x => x.SoLuong)sản phẩm,
-        @Model.TongTien.ToString("c")*@
-   }
+@*<p>Summary</p>*@
+<div class="navbar-text">
+    <div class="checkout">
+        <a>@Html.ActionLink("Giỏ hàng của bạn", "Cart", "Movies")</a>
+        <a>@Html.ActionLink("Checkout", "Checkout", "Movies",
+        new { @class = "btn btn-default navbar-btn" })</a>
+           
+    </div>
+    <div class="summary">
+        @if (Model != null)
+         {
+            <p>Số Lượng: @Model.ChiTietHoaDons.Sum(x => x.SoLuong)</p>
+            <p>Tổng tiền:@Model.TongTien.ToString("c")</p>
+         }
+    </div>
 </div>
 

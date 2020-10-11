@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using MimeKit;
 using MvcMovie.Data;
 using MvcMovie.Models;
 using MvcMovie.Utils;
@@ -26,9 +29,10 @@ namespace MvcMovie.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(HoaDon hoaDon)
         {
             var applicationDbContext = _context.Movies.Include(m => m.GenreObj);
+            //Ghi cookie xuong DB
             bool isExisted = await _context.HoaDons.AnyAsync(x => x.MaHoaDonTam == Request.Cookies[CartId]);
             if (!isExisted)
             {
@@ -37,7 +41,7 @@ namespace MvcMovie.Controllers
                     Expires = DateTime.Now.AddMonths(3)
                 };
                 var cartId = Guid.NewGuid();
-                var hoaDon = new HoaDon
+                hoaDon = new HoaDon
                 {
                     MaHoaDonTam = cartId.ToString()
                 };
@@ -47,7 +51,13 @@ namespace MvcMovie.Controllers
 
                 Response.Cookies.Append(CartId, cartId.ToString());
             }
+            else
+            {
+                string cookie = Request.Cookies[CartId];
 
+                hoaDon = await _context.HoaDons.Include(x => x.ChiTietHoaDons).ThenInclude(x => x.MovieObj).FirstOrDefaultAsync(x => x.MaHoaDonTam == cookie);
+            }
+            ViewBag.HoaDon = hoaDon;
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -126,7 +136,9 @@ namespace MvcMovie.Controllers
             {
                 return NotFound();
             }
-            ViewData["IdGenre"] = new SelectList(_context.Genres, "IdGenre", "IdGenre", movie.IdGenre);
+            ViewBag.ListGenre = _context.Genres.Select(x => new SelectListItem() { Text = x.Name, Value = x.IdGenre.ToString() })
+            .Distinct().ToList();
+            //ViewData["IdGenre"] = new SelectList(_context.Genres, "IdGenre", "IdGenre", movie.IdGenre);
             return View(movie);
         }
 
@@ -272,29 +284,52 @@ namespace MvcMovie.Controllers
             return View(hoaDon);
         }
 
-        public ActionResult RemoveFromCart(int maMovies, HoaDon hoaDon)
+        public async Task<IActionResult> RemoveFromCart(int maMovies, HoaDon hoaDon)
         {
             //var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
+            string cookie = Request.Cookies[CartId];
+
+            hoaDon = await _context.HoaDons.Include(x => x.ChiTietHoaDons).ThenInclude(x => x.MovieObj).FirstOrDefaultAsync(x => x.MaHoaDonTam == cookie);
             var chiTietHoaDon = hoaDon.ChiTietHoaDons.Where(x =>
             x.MovieObj.Id == maMovies).FirstOrDefault();
-            hoaDon.ChiTietHoaDons.Remove(chiTietHoaDon);
+            if (chiTietHoaDon.SoLuong >1)
+            {
+                chiTietHoaDon.SoLuong--;
+            }
+            else
+            {
+                hoaDon.ChiTietHoaDons.Remove(chiTietHoaDon);
+            }
+            await _context.SaveChangesAsync();
             return View("AddToCart", hoaDon);
         }
-
-        public PartialViewResult Summary()
+        public async Task<IActionResult> Cart(HoaDon hoaDon)
         {
+            string cookie = Request.Cookies[CartId];
+
+            hoaDon = await _context.HoaDons.Include(x => x.ChiTietHoaDons)
+                .ThenInclude(x => x.MovieObj)
+                .FirstOrDefaultAsync(x => x.MaHoaDonTam == cookie);
+            return View("AddToCart", hoaDon);
+        }
+        public async Task<PartialViewResult> Summary()
+        {
+            string cookie = Request.Cookies[CartId];
+            HoaDon hoaDon;
+            hoaDon = await _context.HoaDons.Include(x => x.ChiTietHoaDons).ThenInclude(x => x.MovieObj).FirstOrDefaultAsync(x => x.MaHoaDonTam == cookie);
             //var hoaDon = this.Session["HoaDon"] as HoaDon;
-            //if (hoaDon == null)
-            //{
-            //    return null;
-            //}
-            //return PartialView(hoaDon);
-            return PartialView();
+            if (hoaDon == null)
+            {
+                return null;
+            }
+            return PartialView(hoaDon);
         }
 
-        [HttpPost]
-        public ActionResult Checkout(ShippingDetail detail, HoaDon hoaDon)
+        //[HttpPost]
+        public async Task<IActionResult> Checkout(ShippingDetail detail, HoaDon hoaDon)
         {
+            string cookie = Request.Cookies[CartId];
+            hoaDon = _context.HoaDons.Include(x => x.ChiTietHoaDons).ThenInclude(x => x.MovieObj).FirstOrDefault(x => x.MaHoaDonTam == cookie);
             //var hoaDon = HttpContext.Session.Get<HoaDon>("HoaDon");
             if (hoaDon.ChiTietHoaDons.Count() == 0)
             {
@@ -305,25 +340,40 @@ namespace MvcMovie.Controllers
                 StringBuilder body = new StringBuilder()
                 .AppendLine("A new order has been submitted")
                 .AppendLine("---")
-                .AppendLine("Items:");
+                .AppendLine("Items:")
+                .AppendLine("");
                 foreach (var hoaDonChiTiet in hoaDon.ChiTietHoaDons)
                 {
                     var subtotal = hoaDonChiTiet.MovieObj.Price * hoaDonChiTiet.SoLuong;
-                    body.AppendFormat("{0} x {1} (subtotal: {2:c}", hoaDonChiTiet.SoLuong,
+                    body.AppendFormat("{0} x {1} (subtotal: {2:c})", hoaDonChiTiet.SoLuong,
                     hoaDonChiTiet.MovieObj.Title,
                     subtotal);
+                    body.AppendLine("");
                 }
                 body.AppendFormat("Total order value: {0:c}", hoaDon.TongTien)
                 .AppendLine("---")
                 .AppendLine("Ship to:")
                 .AppendLine(detail.Name)
                 .AppendLine(detail.Address)
-                .AppendLine(detail.Mobile.ToString());
-                MailUtils.SendMailGoogleSmtp("BIS@ueh.edu.vn", detail.Email, "New order submitted!",
-                body.ToString(),
-                "your@gmail", "your gmail Pass");
-                HttpContext.Session.Set<HoaDon>("HoaDon", null);
-                return View("CheckoutCompleted");
+                .AppendLine(detail.Mobile.ToString())
+                .AppendLine("");
+                body.AppendFormat("Ngày giao hàng: {0}", detail.ReleaseDate);
+
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("nguyen luan", "phucluan6052000@gmail.com"));
+                message.To.Add(new MailboxAddress("NGUYEN PHUC LUAN", detail.Email));
+                message.Subject = "Test email shipping detail";
+                message.Body = new TextPart("plain") { Text = body.ToString()};
+                using (var client = new SmtpClient())
+                {
+                    client.Connect("smtp.gmail.com",587, false);
+                    client.Authenticate("phucluan6052000@gmail.com", "NguyenPhucLuan@0988004673");
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+                _context.ShippingDetails.Add(detail);
+                await _context.SaveChangesAsync();
+                return View("CheckoutCompleted", detail);
             }
             else
             {
@@ -333,7 +383,8 @@ namespace MvcMovie.Controllers
 
         public IActionResult CheckoutCompleted()
         {
-            return View();
+            var applicationDbContext = _context.ShippingDetails;
+            return View(applicationDbContext.ToList());
         }
 
         private bool MovieExists(int id)

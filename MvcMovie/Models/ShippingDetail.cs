@@ -9,10 +9,10 @@ namespace MvcMovie.Models
     public class ShippingDetail
     {
         public int ID { get; set; }
-        [Display(Name = "Ten")]
+        [Display(Name = "Tên")]
         [Required]
         public string Name { get; set; }
-        [Display(Name = "Dia Chi")]
+        [Display(Name = "Địa Chỉ")]
         [Required]
         public string Address { get; set; }
         [Display(Name = "Email")]
